@@ -1,0 +1,11 @@
+int INT
+main IDENTIFIER
+( (
+) )
+{ {
+myproc IDENTIFIER
+( (
+a IDENTIFIER
+) )
+; ;
+} }
