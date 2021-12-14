@@ -27,11 +27,12 @@
 class IRGenerator : public RecursiveASTVisitor<IRGenerator> {
 protected:
     static std::unique_ptr<llvm::LLVMContext> context;
+    static std::unique_ptr<llvm::Module> module;
     static std::unique_ptr<llvm::IRBuilder<>> builder;
 
 public:
     bool visitWhileStmt(WhileStmt *S) {
-        llvm::BasicBlock *WhileCondBB = llvm::BasicBlock::Create(*context, "while.cond", )
+        //llvm::BasicBlock *WhileCondBB = llvm::BasicBlock::Create(*context, "while.cond", )
     }
 };
 

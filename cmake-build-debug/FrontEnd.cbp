@@ -144,6 +144,9 @@
 		<Unit filename="/home/tangny/Tasks/BadCompiler/FrontEnd/include/ASTConsumers/ASTDumper.h">
 			<Option target="FrontEnd"/>
 		</Unit>
+		<Unit filename="/home/tangny/Tasks/BadCompiler/FrontEnd/include/ASTConsumers/IRGenerator.h">
+			<Option target="FrontEnd"/>
+		</Unit>
 		<Unit filename="/home/tangny/Tasks/BadCompiler/FrontEnd/include/Parser/CST.h">
 			<Option target="FrontEnd"/>
 		</Unit>

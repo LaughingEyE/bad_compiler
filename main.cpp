@@ -43,7 +43,7 @@ int main() {
     if(translationUnitDecl == NULL)
         std::cout << "create AST failed";
     ASTDumper astDumper;
-    //astDumper.traverseTranslationUnitDecl(translationUnitDecl);
+    astDumper.traverseTranslationUnitDecl(translationUnitDecl);
     deleteCST(head);
 }
 

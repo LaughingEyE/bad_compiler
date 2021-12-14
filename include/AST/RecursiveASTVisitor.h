@@ -17,6 +17,8 @@ public:
 
     bool traverseInPreOrder() const { return true; }
 
+    bool walkUpToTop() const { return true; }
+
 
 // 定义所有Decl类的Traverse,cleanup,Visit和WalkUpFrom函数
 public:
@@ -39,7 +41,8 @@ public:
 
 #define DECL(CLASS, BASE)                                                       \
    bool walkUpFrom##CLASS(CLASS *D) {                                           \
-     walkUpFrom##BASE(D);                                                       \
+     if(getDerived().walkUpToTop())                                             \
+       walkUpFrom##BASE(D);                                                     \
      getDerived().visit##CLASS(D);                                              \
      return true;                                                               \
    }                                                                            \
@@ -67,7 +70,8 @@ public:
 
 #define STMT(CLASS, BASE)                                                       \
    bool walkUpFrom##CLASS(CLASS *S) {                                           \
-     walkUpFrom##BASE(S);                                                       \
+     if(getDerived().walkUpToTop())                                             \
+       walkUpFrom##BASE(S);                                                     \
      getDerived().visit##CLASS(S);                                              \
      return true;                                                               \
    }                                                                            \
@@ -91,7 +95,7 @@ void raiseNoSupport( bool, short, std::string );
        walkUpFrom##DECL(D);                                                     \
      { CODE; }                                                                  \
      if (getDerived().traverseInPreOrder())                                     \
-       cleanup##DECL();                                                         \
+       getDerived().cleanup##DECL();                                            \
      if (shouldVisitChildren && !getDerived().traverseInPreOrder())             \
        walkUpFrom##DECL(D);                                                     \
      return true;                                                               \
@@ -106,7 +110,7 @@ DEF_TRAVERSE_DECL(TranslationUnitDecl, {
         // 未处理枚举类or结构体定义
         switch(stmt->getKind()) {
             case(Stmt::k_DeclStmt):
-                traverseDeclStmt(D);
+                traverseDeclStmt(dynamic_cast<DeclStmt*>(stmt));
                 break;
             default:
                 raiseNoSupport(false, stmt->getKind(), "TranslationUnitDecl");
@@ -163,7 +167,7 @@ DEF_TRAVERSE_DECL(ParamVarDecl, {
        walkUpFrom##STMT(S);                                                     \
      { CODE; }                                                                  \
      if (getDerived().traverseInPreOrder())                                     \
-       cleanup##STMT();                                                         \
+       getDerived().cleanup##STMT();                                            \
      if (shouldVisitChildren && !getDerived().traverseInPreOrder())             \
        walkUpFrom##STMT(S);                                                     \
      return true;                                                               \
@@ -218,7 +222,7 @@ DEF_TRAVERSE_STMT(ForStmt, {
     traverseExprHelper(S->getCond(), "ForStmt");
 
     if(S->hasInc())
-        traverseExprHelper(S->getInc());
+        traverseExprHelper(S->getInc(), "ForStmt");
 
     assert(S->hasBody());
     traverseStmtHelper(S->getBody(), "ForStmt");
@@ -284,22 +288,22 @@ template <typename Derived>
 void RecursiveASTVisitor<Derived>::traverseExprHelper( Expr *expr, std::string ctx ) {
     switch(expr->getKind()) {
         case(Stmt::k_BinaryOperator):
-            traverseBinaryOperator(expr);
+            traverseBinaryOperator(dynamic_cast<BinaryOperator*>(expr));
             break;
         case(Stmt::k_UnaryOperator):
-            traverseUnaryOperator(expr);
+            traverseUnaryOperator(dynamic_cast<UnaryOperator*>(expr));
             break;
         case(Stmt::k_DeclRefExpr):
-            traverseDeclRefExpr(expr);
+            traverseDeclRefExpr(dynamic_cast<DeclRefExpr*>(expr));
             break;
         case(Stmt::k_IntegerLiteral):
-            traverseIntegerLiteral(expr);
+            traverseIntegerLiteral(dynamic_cast<IntegerLiteral*>(expr));
             break;
         case(Stmt::k_ImplicitCastExpr):
-            traverseImplicitCastExpr(expr);
+            traverseImplicitCastExpr(dynamic_cast<ImplicitCastExpr*>(expr));
             break;
         case(Stmt::k_ExplicitCastExpr):
-            traverseImplicitCastExpr(expr);
+            traverseExplicitCastExpr(dynamic_cast<ExplicitCastExpr*>(expr));
             break;
         default:
             raiseNoSupport(false, expr->getKind(), ctx);
