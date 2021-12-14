@@ -27,7 +27,7 @@ public:
 #undef DECL
 #endif
 
-#define DECL(CLASS, BASE) bool cleanUp##CLASS(CLASS *D) { return true; }
+#define DECL(CLASS, BASE) bool cleanup##CLASS() { return true; }
 #include "include/AST/DeclNodes.h"
 
 #ifdef DECL
@@ -55,7 +55,7 @@ public:
 #undef STMT
 #endif
 
-#define STMT(CLASS, BASE) bool cleanUp##CLASS(CLASS *D) { return true; }
+#define STMT(CLASS, BASE) bool cleanup##CLASS() { return true; }
 #include "include/AST/StmtNodes.h"
 
 #ifdef STMT
@@ -90,6 +90,8 @@ void raiseNoSupport( bool, short, std::string );
      if (getDerived().traverseInPreOrder())                                     \
        walkUpFrom##DECL(D);                                                     \
      { CODE; }                                                                  \
+     if (getDerived().traverseInPreOrder())                                     \
+       cleanup##DECL();                                                         \
      if (shouldVisitChildren && !getDerived().traverseInPreOrder())             \
        walkUpFrom##DECL(D);                                                     \
      return true;                                                               \
@@ -160,6 +162,8 @@ DEF_TRAVERSE_DECL(ParamVarDecl, {
      if (getDerived().traverseInPreOrder())                                     \
        walkUpFrom##STMT(S);                                                     \
      { CODE; }                                                                  \
+     if (getDerived().traverseInPreOrder())                                     \
+       cleanup##STMT();                                                         \
      if (shouldVisitChildren && !getDerived().traverseInPreOrder())             \
        walkUpFrom##STMT(S);                                                     \
      return true;                                                               \
